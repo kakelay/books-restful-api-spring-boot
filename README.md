@@ -52,7 +52,7 @@ Create the necessary database tables using the SQL scripts:
 #### Book Table
 
 ```sql
-CREATE TABLE books (
+CREATE TABLE book (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
