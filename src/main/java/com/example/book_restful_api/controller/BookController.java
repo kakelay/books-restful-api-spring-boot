@@ -6,14 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
+
+
+
+
     @Autowired
     private BookService bookService;
+    private String generateTraceId() {
+        // Generate a random UUID as the trace ID
+        return UUID.randomUUID().toString();
+    }
+
 
     // Get all books
     @GetMapping
@@ -43,11 +55,26 @@ public class BookController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Delete a book
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
-        return bookService.deleteBook(id)
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+    public ResponseEntity<Map<String, Object>> deleteBook(@PathVariable Long id) {
+        boolean isDeleted = bookService.deleteBook(id);
+        Map<String, Object> response = new HashMap<>();
+        String traceId = generateTraceId(); // Assume this method generates a unique trace ID
+
+        if (isDeleted) {
+            response.put("traceId", traceId);
+            response.put("bookId", id);
+            response.put("message", "Book deleted successfully.");
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(404).body(Map.of(
+                    "traceId", traceId,
+                    "bookId", id,
+                    "message", "Book not found."
+            ));
+         }
     }
+
+
+
 }
