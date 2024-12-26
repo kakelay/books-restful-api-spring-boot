@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
 @Entity
@@ -17,6 +15,10 @@ public class Book {
     private String title;
     private String author;
     private Double price;
+    private String genre;
+    private Integer publishedYear ;
+
+
 
     // Getters and setters
     public Long getId() {
@@ -47,7 +49,22 @@ public class Book {
         return price;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setPrice(Double price) {this.price = price;}
+
+    public Integer getPublishedYear() {
+        return publishedYear;
     }
+
+    public void setPublishedYear(Integer publishedYear) {
+        this.publishedYear = publishedYear;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
 }
