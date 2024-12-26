@@ -155,10 +155,11 @@ src/
 ```json
 POST /api/books
 {
-  "title": "The Great Gatsby",
-  "author": "F. Scott Fitzgerald",
-  "genre": "Fiction",
-  "publishedYear": 1925
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "genre": "Fiction",
+    "price": 10.99,
+    "published_year": 1925
 }
 ```
 
