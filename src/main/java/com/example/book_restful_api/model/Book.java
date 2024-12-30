@@ -16,7 +16,7 @@ public class Book {
     private String author;
     private Double price;
     private String genre;
-    private String publishedYear ;
+    private String published_year ;
 
 
 
@@ -51,12 +51,12 @@ public class Book {
 
     public void setPrice(Double price) {this.price = price;}
 
-    public String getPublishedYear() {
-        return publishedYear;
+    public String getPublished_year() {
+        return published_year;
     }
 
-    public void setPublishedYear(String publishedYear) {
-        this.publishedYear = publishedYear;
+    public void setPublished_year(String published_year) {
+        this.published_year = published_year;
     }
 
     public String getGenre() {

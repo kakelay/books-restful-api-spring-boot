@@ -31,7 +31,7 @@ public class BookService {
             book.setTitle(bookDetails.getTitle());
             book.setAuthor(bookDetails.getAuthor());
             book.setPrice(bookDetails.getPrice());
-            book.setPublishedYear(bookDetails.getPublishedYear());
+            book.setPublished_year(bookDetails.getPublished_year());
             book.setGenre(bookDetails.getGenre());
             return bookRepository.save(book);
         });
