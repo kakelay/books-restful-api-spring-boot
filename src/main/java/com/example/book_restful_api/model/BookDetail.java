@@ -17,7 +17,7 @@ public class BookDetail {
 
     private String genre;
 
-    private Integer publishedYear;
+    private String published_year;
 
     @Column(length = 1000)
     private String description;
@@ -55,12 +55,12 @@ public class BookDetail {
         this.genre = genre;
     }
 
-    public Integer getPublishedYear() {
-        return publishedYear;
+    public String getPublished_year() {
+        return published_year;
     }
 
-    public void setPublishedYear(Integer publishedYear) {
-        this.publishedYear = publishedYear;
+    public void setPublished_year(String published_year) {
+        this.published_year = published_year;
     }
 
     public String getDescription() {

@@ -1,4 +1,4 @@
-package com.example.library.controller;
+package com.example.book_restful_api.controller;
 
 
 import com.example.book_restful_api.model.BookDetail;
@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/api/book_detail")
 public class BookDetailController {
     private final BookDetailService service;
 

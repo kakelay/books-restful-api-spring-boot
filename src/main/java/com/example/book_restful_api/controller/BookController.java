@@ -15,10 +15,6 @@ import java.util.UUID;
 @RequestMapping("/api/books")
 public class BookController {
 
-
-
-
-
     @Autowired
     private BookService bookService;
     private String generateTraceId() {
