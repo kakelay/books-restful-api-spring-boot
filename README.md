@@ -1,4 +1,4 @@
-Here is a `README.md` file documenting the code for the `Book` and `BookDetail` features. The structure is designed to be user-friendly and provide all necessary information.
+Here is a `README.md` file documenting the code for the `Book` and `BookDetail` features. The structure is designed to be user-friendly and provide all necessary informations.
 
 ---
 
