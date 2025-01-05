@@ -27,7 +27,12 @@ public class BookDetailService {
         return repository.save(bookDetail);
     }
 
-    public void deleteBook(Long id) {
-        repository.deleteById(id);
+    public boolean deleteBook(Long id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            return true;
+        }
+        return false;
     }
+
 }
