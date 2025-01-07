@@ -37,11 +37,11 @@ public class BookDetailController {
             List<BookDetail> bookDetails = service.getAllBooks();
             response.put("status", "success");
             response.put("bookDetails", bookDetails);
-            response.put("message", "Book details retrieved successfully.");
+            response.put("message", "Book details retrieved successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("status", "fail");
-            response.put("message", "Failed to retrieve book details.");
+            response.put("message", "Failed to retrieve book details");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -61,16 +61,16 @@ public class BookDetailController {
             if (bookDetail.isPresent()) {
                 response.put("status", "success");
                 response.put("bookDetail", bookDetail.get());
-                response.put("message", "Book detail retrieved successfully.");
+                response.put("message", "Book detail retrieved successfully");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", "fail");
-                response.put("message", "Book detail not found.");
+                response.put("message", "Book detail not found");
                 return ResponseEntity.status(404).body(response);
             }
         } catch (Exception e) {
             response.put("status", "fail");
-            response.put("message", "Failed to retrieve book detail.");
+            response.put("message", "Failed to retrieve book detail");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -87,42 +87,42 @@ public class BookDetailController {
             // Validate the incoming book detail object
             if (bookDetail.getTitle() == null || bookDetail.getTitle().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "Book title is required.");
+                response.put("message", "Book title is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetail.getAuthor() == null || bookDetail.getAuthor().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "author: Book author is required.");
+                response.put("message", "author: Book author is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetail.getGenre() == null || bookDetail.getGenre().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "genre: Book genre is required.");
+                response.put("message", "genre: Book genre is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetail.getDescription() == null || bookDetail.getDescription().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "description: Book description is required.");
+                response.put("message", "description: Book description is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetail.getPublished_year() == null || bookDetail.getPublished_year().length() != 4) {
                 response.put("status", "fail");
-                response.put("message", "published_year : Book published year must be a valid 4-digit year.");
+                response.put("message", "published_year : Book published year must be a valid 4-digit year");
                 return ResponseEntity.badRequest().body(response);
             }
             // Create the book detail
             BookDetail createdBookDetail = service.saveBook(bookDetail);
             response.put("status", "success");
             response.put("bookDetail", createdBookDetail);
-            response.put("message", "Book detail created successfully.");
+            response.put("message", "Book detail created successfully");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("status", "fail");
-            response.put("message", "Failed to create the book detail.");
+            response.put("message", "Failed to create the book detail");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -144,16 +144,16 @@ public class BookDetailController {
                 BookDetail updatedBookDetail = service.saveBook(bookDetail);
                 response.put("status", "success");
                 response.put("bookDetail", updatedBookDetail);
-                response.put("message", "Book detail updated successfully.");
+                response.put("message", "Book detail updated successfully");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", "fail");
-                response.put("message", "Book detail not found.");
+                response.put("message", "Book detail not found");
                 return ResponseEntity.status(404).body(response);
             }
         } catch (Exception e) {
             response.put("status", "fail");
-            response.put("message", "Failed to update the book detail.");
+            response.put("message", "Failed to update the book detail");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -172,16 +172,16 @@ public class BookDetailController {
 
             if (isDeleted) {
                 response.put("status", "success");
-                response.put("message", "Book detail deleted successfully.");
+                response.put("message", "Book detail deleted successfully");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", "fail");
-                response.put("message", "Book detail not found.");
+                response.put("message", "Book detail not found");
                 return ResponseEntity.status(404).body(response);
             }
         } catch (Exception e) {
             response.put("status", "fail");
-            response.put("message", "Failed to delete the book detail.");
+            response.put("message", "Failed to delete the book detail");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
