@@ -152,31 +152,31 @@ public class BookController {
             // Validate incoming book details
             if (bookDetails.getTitle() == null || bookDetails.getTitle().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "Book title is required.");
+                response.put("message", "Book title is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetails.getAuthor() == null || bookDetails.getAuthor().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "Book author is required.");
+                response.put("message", "Book author is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetails.getGenre() == null || bookDetails.getGenre().isEmpty()) {
                 response.put("status", "fail");
-                response.put("message", "Book genre is required.");
+                response.put("message", "Book genre is required");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetails.getPrice() == null || bookDetails.getPrice() <= 0) {
                 response.put("status", "fail");
-                response.put("message", "Book price must be a positive number.");
+                response.put("message", "Book price must be a positive number");
                 return ResponseEntity.badRequest().body(response);
             }
 
             if (bookDetails.getPublished_year() == null || bookDetails.getPublished_year().length() != 4) {
                 response.put("status", "fail");
-                response.put("message", "Book published year must be a valid 4-digit year.");
+                response.put("message", "Book published year must be a valid 4-digit year");
                 return ResponseEntity.badRequest().body(response);
             }
 
@@ -184,7 +184,7 @@ public class BookController {
                 Integer.parseInt(bookDetails.getPublished_year());
             } catch (NumberFormatException e) {
                 response.put("status", "fail");
-                response.put("message", "Book published year must be a numeric value.");
+                response.put("message", "Book published year must be a numeric value");
                 return ResponseEntity.badRequest().body(response);
             }
 
@@ -194,7 +194,7 @@ public class BookController {
             if (updatedBook.isPresent()) {
                 response.put("status", "success");
                 response.put("book", updatedBook.get());
-                response.put("message", "Book updated successfully.");
+                response.put("message", "Book updated successfully");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", "fail");
@@ -204,7 +204,7 @@ public class BookController {
         } catch (Exception e) {
             // Handle unexpected errors
             response.put("status", "fail");
-            response.put("message", "Failed to update the book.");
+            response.put("message", "Failed to update the book");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
@@ -224,7 +224,7 @@ public class BookController {
 
             if (isDeleted) {
                 response.put("status", "success");
-                response.put("message", "Book deleted successfully.");
+                response.put("message", "Book deleted successfully");
                 return ResponseEntity.ok(response);
             } else {
                 response.put("status", "fail");
@@ -234,7 +234,7 @@ public class BookController {
         } catch (Exception e) {
             // Handle unexpected errors
             response.put("status", "fail");
-            response.put("message", "Failed to delete the book.");
+            response.put("message", "Failed to delete the book");
             response.put("error", e.getMessage());
             return ResponseEntity.status(500).body(response);
         }
