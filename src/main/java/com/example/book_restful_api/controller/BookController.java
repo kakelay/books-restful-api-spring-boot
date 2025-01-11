@@ -6,11 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/books")
@@ -20,31 +16,50 @@ public class BookController {
     private BookService bookService;
 
     private String generateTraceId() {
-        // Generate a random UUID as the trace ID
         return UUID.randomUUID().toString();
+    }
+
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(String traceId, String message, String error, int statusCode) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("traceId", traceId);
+        response.put("status", "fail");
+        response.put("message", message);
+        if (error != null) {
+            response.put("error", error);
+        }
+        return ResponseEntity.status(statusCode).body(response);
+    }
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(Map<String, Object> response, String message, String error) {
+        response.put("status", "fail");
+        response.put("message", message);
+        if (error != null) {
+            response.put("details", error);
+        }
+        return ResponseEntity.badRequest().body(response);
+    }
+
+
+    private ResponseEntity<Map<String, Object>> buildErrorResponse(String traceId, String message, int statusCode) {
+        return buildErrorResponse(traceId, message, null, statusCode);
     }
 
     // Get all books
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllBooks() {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
 
         try {
             List<Book> books = bookService.getAllBooks();
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("traceId", traceId);
             response.put("status", "success");
-            response.put("books", books);
             response.put("message", "Books retrieved successfully.");
+            response.put("books", books);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to retrieve books.");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return buildErrorResponse(traceId, "Failed to retrieve books.", e.getMessage(), 500);
         }
     }
-
 
     // Get book by ID
     @GetMapping("/{id}")
@@ -63,15 +78,11 @@ public class BookController {
                 response.put("message", "Book retrieved successfully.");
                 return ResponseEntity.ok(response);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book not found.");
-                return ResponseEntity.status(404).body(response);
+                return buildErrorResponse(response, "Book not found.",
+                        String.format("The book with ID %d does not exist in the system.", id));
             }
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to retrieve book.");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return buildErrorResponse(response, "Failed to retrieve book.", e.getMessage());
         }
     }
 
@@ -80,163 +91,110 @@ public class BookController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> createBook(@RequestBody Book book) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
 
         try {
-            // Validate the incoming book object
+            // Validation
             if (book.getTitle() == null || book.getTitle().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book title is required.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book title is required.", 400);
             }
-
             if (book.getAuthor() == null || book.getAuthor().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book author is required.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book author is required.", 400);
             }
-
             if (book.getGenre() == null || book.getGenre().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book genre is required.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book genre is required.", 400);
             }
-
             if (book.getPrice() == null || book.getPrice() <= 0) {
-                response.put("status", "fail");
-                response.put("message", "Book price must be a positive number.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book price must be a positive number.", 400);
             }
-
             if (book.getPublished_year() == null || book.getPublished_year().length() != 4) {
-                response.put("status", "fail");
-                response.put("message", "Book published year must be a valid 4-digit year.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book published year must be a valid 4-digit year.", 400);
             }
 
             try {
                 Integer.parseInt(book.getPublished_year());
             } catch (NumberFormatException e) {
-                response.put("status", "fail");
-                response.put("message", "Book published year must be a numeric value.");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book published year must be a numeric value.", 400);
             }
 
-            // Create the book
+            // Create book
             Book createdBook = bookService.createBook(book);
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("traceId", traceId);
             response.put("status", "success");
-            response.put("book", createdBook);
             response.put("message", "Book created successfully.");
+            response.put("book", createdBook);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            // Handle unexpected errors
-            response.put("status", "fail");
-            response.put("message", "Failed to create the book.");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return buildErrorResponse(traceId, "Failed to create the book.", e.getMessage(), 500);
         }
     }
-
-
 
     // Update a book
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-        response.put("bookId", id);
 
         try {
-            // Validate incoming book details
+            // Validation
             if (bookDetails.getTitle() == null || bookDetails.getTitle().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book title is required");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book title is required.", 400);
             }
-
             if (bookDetails.getAuthor() == null || bookDetails.getAuthor().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book author is required");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book author is required.", 400);
             }
-
             if (bookDetails.getGenre() == null || bookDetails.getGenre().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book genre is required");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book genre is required.", 400);
             }
-
             if (bookDetails.getPrice() == null || bookDetails.getPrice() <= 0) {
-                response.put("status", "fail");
-                response.put("message", "Book price must be a positive number");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book price must be a positive number.", 400);
             }
-
             if (bookDetails.getPublished_year() == null || bookDetails.getPublished_year().length() != 4) {
-                response.put("status", "fail");
-                response.put("message", "Book published year must be a valid 4-digit year");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book published year must be a valid 4-digit year.", 400);
             }
 
             try {
                 Integer.parseInt(bookDetails.getPublished_year());
             } catch (NumberFormatException e) {
-                response.put("status", "fail");
-                response.put("message", "Book published year must be a numeric value");
-                return ResponseEntity.badRequest().body(response);
+                return buildErrorResponse(traceId, "Book published year must be a numeric value.", 400);
             }
 
-            // Update the book
+            // Update book
             Optional<Book> updatedBook = bookService.updateBook(id, bookDetails);
-
             if (updatedBook.isPresent()) {
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("traceId", traceId);
                 response.put("status", "success");
+                response.put("message", "Book updated successfully.");
                 response.put("book", updatedBook.get());
-                response.put("message", "Book updated successfully");
                 return ResponseEntity.ok(response);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book not found.");
-                return ResponseEntity.status(404).body(response);
+                return buildErrorResponse(traceId, "Book not found.", 404);
             }
         } catch (Exception e) {
-            // Handle unexpected errors
-            response.put("status", "fail");
-            response.put("message", "Failed to update the book");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return buildErrorResponse(traceId, "Failed to update the book.", e.getMessage(), 500);
         }
     }
-
 
     // Delete a book
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteBook(@PathVariable Long id) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-        response.put("bookId", id);
 
         try {
             boolean isDeleted = bookService.deleteBook(id);
-
             if (isDeleted) {
+                Map<String, Object> response = new LinkedHashMap<>();
+                response.put("traceId", traceId);
                 response.put("status", "success");
-                response.put("message", "Book deleted successfully");
+                response.put("message", "Book deleted successfully.");
+                response.put("bookId", id);
+                response.put("timestamp", new Date().toString()); // Add timestamp for reference
                 return ResponseEntity.ok(response);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book not found.");
-                return ResponseEntity.status(404).body(response);
+                return buildErrorResponse(traceId, "Book not found.", 404);
             }
         } catch (Exception e) {
-            // Handle unexpected errors
-            response.put("status", "fail");
-            response.put("message", "Failed to delete the book");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return buildErrorResponse(traceId, "Failed to delete the book.", e.getMessage(), 500);
         }
     }
 
