@@ -113,7 +113,7 @@ public class BookController {
             try {
                 Integer.parseInt(book.getPublished_year());
             } catch (NumberFormatException e) {
-                return buildErrorResponse(traceId, "Book published year must be a numeric value.", 400);
+                return buildErrorResponse(traceId, "Book published year must be a numeric value", 400);
             }
 
             // Create book
