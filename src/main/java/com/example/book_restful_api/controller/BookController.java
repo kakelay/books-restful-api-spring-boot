@@ -64,7 +64,7 @@ public class BookController {
             }
             return buildErrorResponse(traceId, "Book not found.", "The book with ID " + id + " does not exist.", 404);
         } catch (Exception e) {
-            return buildErrorResponse(traceId, "Failed to retrieve book.", e.getMessage(), 500);
+            return buildErrorResponse(traceId, "Failed to retrieve book", e.getMessage(), 500);
         }
     }
 
