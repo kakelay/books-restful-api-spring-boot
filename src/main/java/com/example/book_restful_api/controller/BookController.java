@@ -121,7 +121,7 @@ public class BookController {
             Map<String, Object> response = new LinkedHashMap<>();
             response.put("traceId", traceId);
             response.put("status", "success");
-            response.put("message", "Book created successfully.");
+            response.put("message", "Book created successfully");
             response.put("book", createdBook);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
