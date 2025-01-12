@@ -186,7 +186,7 @@ public class BookController {
                 Map<String, Object> response = new LinkedHashMap<>();
                 response.put("traceId", traceId);
                 response.put("status", "success");
-                response.put("message", "Book deleted successfully.");
+                response.put("message", "Book deleted successfully");
                 response.put("bookId", id);
                 response.put("timestamp", new Date().toString()); // Add timestamp for reference
                 return ResponseEntity.ok(response);
