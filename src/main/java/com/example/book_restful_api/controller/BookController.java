@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/books")
 public class BookController {
-
     @Autowired
     private BookService bookService;
 
