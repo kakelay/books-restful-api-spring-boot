@@ -5,11 +5,7 @@ import com.example.book_restful_api.service.BookDetailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/book_detail")
@@ -22,170 +18,123 @@ public class BookDetailController {
     }
 
     private String generateTraceId() {
-        // Generate a random UUID as the trace ID
         return UUID.randomUUID().toString();
     }
 
-    // Get all book details
+    private ResponseEntity<Map<String, Object>> buildResponse(String traceId, String status, String message, Object data, int statusCode) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("traceId", traceId);
+        response.put("message", message);
+        response.put("responseDate", new Date());
+        response.put("status", status);
+        if (data != null) {
+            response.put("data", data);
+        }
+        return ResponseEntity.status(statusCode).body(response);
+    }
+
+    private ResponseEntity<Map<String, Object>> handleException(String traceId, String action, Exception e) {
+        return buildResponse(traceId, "fail", "Failed to " + action, e.getMessage(), 500);
+    }
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> getAllBookDetails() {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-
         try {
             List<BookDetail> bookDetails = service.getAllBooks();
-            response.put("status", "success");
-            response.put("bookDetails", bookDetails);
-            response.put("message", "Book details retrieved successfully");
-            return ResponseEntity.ok(response);
+            return buildResponse(traceId, "success", "Book details retrieved successfully", bookDetails, 200);
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to retrieve book details");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return handleException(traceId, "retrieve book details", e);
         }
     }
 
-    // Get book detail by ID
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getBookDetailById(@PathVariable Long id) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-        response.put("bookDetailId", id);
-
         try {
             Optional<BookDetail> bookDetail = service.getBookById(id);
-
             if (bookDetail.isPresent()) {
-                response.put("status", "success");
-                response.put("bookDetail", bookDetail.get());
-                response.put("message", "Book detail retrieved successfully");
-                return ResponseEntity.ok(response);
+                return buildResponse(traceId, "success", "Book detail retrieved successfully", bookDetail.get(), 200);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book detail not found");
-                return ResponseEntity.status(404).body(response);
+                return buildResponse(traceId, "fail", "Book detail not found", null, 404);
             }
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to retrieve book detail");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return handleException(traceId, "retrieve book detail", e);
         }
     }
 
-    // Create a new book detail
     @PostMapping
     public ResponseEntity<Map<String, Object>> createBookDetail(@RequestBody BookDetail bookDetail) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-
         try {
-            // Validate the incoming book detail object
-            if (bookDetail.getTitle() == null || bookDetail.getTitle().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "Book title is required");
-                return ResponseEntity.badRequest().body(response);
+            String validationError = validateBookDetail(bookDetail);
+            if (validationError != null) {
+                return buildResponse(traceId, "fail", validationError, null, 400);
             }
-
-            if (bookDetail.getAuthor() == null || bookDetail.getAuthor().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "author: Book author is required");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            if (bookDetail.getGenre() == null || bookDetail.getGenre().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "genre: Book genre is required");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            if (bookDetail.getDescription() == null || bookDetail.getDescription().isEmpty()) {
-                response.put("status", "fail");
-                response.put("message", "description: Book description is required");
-                return ResponseEntity.badRequest().body(response);
-            }
-
-            if (bookDetail.getPublished_year() == null || bookDetail.getPublished_year().length() != 4) {
-                response.put("status", "fail");
-                response.put("message", "published_year : Book published year must be a valid 4-digit year");
-                return ResponseEntity.badRequest().body(response);
-            }
-            // Create the book detail
             BookDetail createdBookDetail = service.saveBook(bookDetail);
-            response.put("status", "success");
-            response.put("bookDetail", createdBookDetail);
-            response.put("message", "Book detail created successfully");
-            return ResponseEntity.ok(response);
+            return buildResponse(traceId, "success", "Book detail created successfully", createdBookDetail, 201);
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to create the book detail");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return handleException(traceId, "create the book detail", e);
         }
     }
 
-    // Update a book detail
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateBookDetail(@PathVariable Long id, @RequestBody BookDetail bookDetail) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-        response.put("bookDetailId", id);
-
         try {
             Optional<BookDetail> existingBookDetail = service.getBookById(id);
-
             if (existingBookDetail.isPresent()) {
                 bookDetail.setId(existingBookDetail.get().getId());
                 BookDetail updatedBookDetail = service.saveBook(bookDetail);
-                response.put("status", "success");
-                response.put("bookDetail", updatedBookDetail);
-                response.put("message", "Book detail updated successfully");
-                return ResponseEntity.ok(response);
+                return buildResponse(traceId, "success", "Book detail updated successfully", updatedBookDetail, 200);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book detail not found");
-                return ResponseEntity.status(404).body(response);
+                return buildResponse(traceId, "fail", "Book detail not found", null, 404);
             }
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to update the book detail");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return handleException(traceId, "update the book detail", e);
         }
     }
 
-    // Delete a book detail
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> deleteBookDetail(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> deleteBookDetail(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String traceId = generateTraceId();
-        Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
-        response.put("bookDetailId", id);
-
         try {
-            boolean isDeleted = service.deleteBook(id);
+            if (!request.containsKey("confirmStatus")) {
+                return buildResponse(traceId, "fail", "confirmStatus is required", null, 400);
+            }
 
+            String confirmStatus = request.get("confirmStatus");
+            if (!"yes".equalsIgnoreCase(confirmStatus)) {
+                return buildResponse(traceId, "fail", "Deletion not confirmed", null, 400);
+            }
+
+            boolean isDeleted = service.deleteBook(id);
             if (isDeleted) {
-                response.put("status", "success");
-                response.put("message", "Book detail deleted successfully");
-                return ResponseEntity.ok(response);
+                return buildResponse(traceId, "success", "Book detail deleted successfully", null, 200);
             } else {
-                response.put("status", "fail");
-                response.put("message", "Book detail not found");
-                return ResponseEntity.status(404).body(response);
+                return buildResponse(traceId, "fail", "Book detail not found", null, 404);
             }
         } catch (Exception e) {
-            response.put("status", "fail");
-            response.put("message", "Failed to delete the book detail");
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return handleException(traceId, "delete the book detail", e);
         }
     }
 
-
+    private String validateBookDetail(BookDetail bookDetail) {
+        if (bookDetail.getTitle() == null || bookDetail.getTitle().isEmpty()) {
+            return "Book title is required";
+        }
+        if (bookDetail.getAuthor() == null || bookDetail.getAuthor().isEmpty()) {
+            return "Book author is required";
+        }
+        if (bookDetail.getGenre() == null || bookDetail.getGenre().isEmpty()) {
+            return "Book genre is required";
+        }
+        if (bookDetail.getDescription() == null || bookDetail.getDescription().isEmpty()) {
+            return "Book description is required";
+        }
+        if (bookDetail.getPublished_year() == null || bookDetail.getPublished_year().length() != 4) {
+            return "Book published year must be a valid 4-digit year";
+        }
+        return null;
+    }
 }
