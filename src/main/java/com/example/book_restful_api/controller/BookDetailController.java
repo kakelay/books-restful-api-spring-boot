@@ -105,7 +105,7 @@ public class BookDetailController {
 
             String confirmStatus = request.get("confirmStatus");
             if (!"yes".equalsIgnoreCase(confirmStatus)) {
-                return buildResponse(traceId, "fail", "Deletion need to confirmed", null, 400);
+                return buildResponse(traceId, "fail", "Deletion need to confirmed first", null, 400);
             }
 
             boolean isDeleted = service.deleteBook(id);
