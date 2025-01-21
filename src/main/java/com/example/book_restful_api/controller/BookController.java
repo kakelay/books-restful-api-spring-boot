@@ -89,9 +89,9 @@ public class BookController {
             validateBook(bookDetails);
             Optional<Book> updatedBook = bookService.updateBook(id, bookDetails);
             if (updatedBook.isPresent()) {
-                return buildResponse("success", "Book updated successfully.", updatedBook.get(), traceId, 200);
+                return buildResponse("success", "Book updated successfully", updatedBook.get(), traceId, 200);
             }
-            return buildErrorResponse(traceId, "Book not found.", null, 404);
+            return buildErrorResponse(traceId, "Book not found", null, 404);
         } catch (IllegalArgumentException e) {
             return buildErrorResponse(traceId, e.getMessage(), null, 400);
         } catch (Exception e) {
