@@ -105,7 +105,7 @@ public class BookController {
         try {
             boolean isDeleted = bookService.deleteBook(id);
             if (isDeleted) {
-                return buildResponse("success", "Book deleted successfully.", Map.of("bookId", id), traceId, 200);
+                return buildResponse("success", "Book deleted successfully", Map.of("bookId", id), traceId, 200);
             }
             return buildErrorResponse(traceId, "Book not found.", null, 404);
         } catch (Exception e) {
