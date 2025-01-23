@@ -21,11 +21,13 @@ public class BookController {
 
     private ResponseEntity<Map<String, Object>> buildResponse(String status, String message, Object data, String traceId, int statusCode) {
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("traceId", traceId);
+
         response.put("status", status);
         response.put("message", message);
+        response.put("responseDate", new Date());
+        response.put("traceId", traceId);
         response.put("data", data);
-        response.put("responseDate", new Date()); // Add responseDate field
+
         return ResponseEntity.status(statusCode).body(response);
     }
 

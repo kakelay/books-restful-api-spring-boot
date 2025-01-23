@@ -23,10 +23,10 @@ public class BookDetailController {
 
     private ResponseEntity<Map<String, Object>> buildResponse(String traceId, String status, String message, Object data, int statusCode) {
         Map<String, Object> response = new HashMap<>();
-        response.put("traceId", traceId);
+        response.put("status", status);
         response.put("message", message);
         response.put("responseDate", new Date());
-        response.put("status", status);
+        response.put("traceId", traceId);
         if (data != null) {
             response.put("data", data);
         }
