@@ -50,7 +50,7 @@ public class BookController {
         String traceId = generateTraceId();
         try {
             List<Book> books = bookService.getAllBooks();
-            return buildResponse("success", "Books retrieved successfully.", books, traceId, 200);
+            return buildResponse("success", "Books retrieved successfully", books, traceId, 200);
         } catch (Exception e) {
             return buildErrorResponse(traceId, "Failed to retrieve books", e.getMessage(), 500);
         }
