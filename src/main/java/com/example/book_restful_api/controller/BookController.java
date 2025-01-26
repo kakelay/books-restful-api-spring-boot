@@ -76,7 +76,7 @@ public class BookController {
         try {
             validateBook(book);
             Book createdBook = bookService.createBook(book);
-            return buildResponse("success", "Book created successfully.", createdBook, traceId, 201);
+            return buildResponse("success", "Book created successfully", createdBook, traceId, 201);
         } catch (IllegalArgumentException e) {
             return buildErrorResponse(traceId, e.getMessage(), null, 400);
         } catch (Exception e) {
