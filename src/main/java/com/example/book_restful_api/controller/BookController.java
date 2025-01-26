@@ -80,7 +80,7 @@ public class BookController {
         } catch (IllegalArgumentException e) {
             return buildErrorResponse(traceId, e.getMessage(), null, 400);
         } catch (Exception e) {
-            return buildErrorResponse(traceId, "Failed to create the book.", e.getMessage(), 500);
+            return buildErrorResponse(traceId, "Failed to create the book", e.getMessage(), 500);
         }
     }
 
