@@ -2,6 +2,10 @@ package com.example.book_restful_api.controller;
 
 import com.example.book_restful_api.model.Book;
 import com.example.book_restful_api.service.BookService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +22,7 @@ public class BookController {
     private String generateTraceId() {
         return UUID.randomUUID().toString();
     }
+    private static final Logger logger = LoggerFactory.getLogger(BookController.class);
 
     private ResponseEntity<Map<String, Object>> buildResponse(String status, String message, Object data, String traceId, int statusCode) {
         Map<String, Object> response = new LinkedHashMap<>();
@@ -50,6 +55,19 @@ public class BookController {
         String traceId = generateTraceId();
         try {
             List<Book> books = bookService.getAllBooks();
+            // Wrap books in a map with key "data"
+            Map<String, Object> logMap = new HashMap<>();
+            logMap.put("data", books);
+
+            // Convert to JSON
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            String booksJson = mapper.writeValueAsString(logMap);
+
+            // Log as JSON
+            logger.info("Books found ({}):\n{}", books.size(), booksJson);
+
+            // response data to end user
             return buildResponse("success", "Books retrieved successfully", books, traceId, 200);
         } catch (Exception e) {
             return buildErrorResponse(traceId, "Failed to retrieve books", e.getMessage(), 500);
@@ -91,6 +109,7 @@ public class BookController {
             validateBook(bookDetails);
             Optional<Book> updatedBook = bookService.updateBook(id, bookDetails);
             if (updatedBook.isPresent()) {
+
                 return buildResponse("success", "Book updated successfully", updatedBook.get(), traceId, 200);
             }
             return buildErrorResponse(traceId, "Book not found", null, 404);
