@@ -15,7 +15,7 @@ public class BookDetailService {
         this.repository = repository;
     }
 
-    public List<BookDetail> getAllBooks() {
+    public List<BookDetail> getAllBooksDetails() {
         return repository.findAll();
     }
 
@@ -28,6 +28,7 @@ public class BookDetailService {
     }
 
     public boolean deleteBook(Long id) {
+
         if (repository.existsById(id)) {
             repository.deleteById(id);
             return true;

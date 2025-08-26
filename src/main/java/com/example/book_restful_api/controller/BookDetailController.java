@@ -21,15 +21,15 @@ public class BookDetailController {
         return UUID.randomUUID().toString();
     }
 
-    private ResponseEntity<Map<String, Object>> buildResponse(String traceId, String status, String message, Object data, int statusCode) {
-        Map<String, Object> response = new HashMap<>();
+    private ResponseEntity<Map<String, Object>> buildResponse(String status, String message, Object data, String traceId, int statusCode) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
         response.put("status", status);
         response.put("message", message);
         response.put("responseDate", new Date());
         response.put("traceId", traceId);
-        if (data != null) {
-            response.put("data", data);
-        }
+        response.put("data", data);
+
         return ResponseEntity.status(statusCode).body(response);
     }
 
@@ -41,8 +41,8 @@ public class BookDetailController {
     public ResponseEntity<Map<String, Object>> getAllBookDetails() {
         String traceId = generateTraceId();
         try {
-            List<BookDetail> bookDetails = service.getAllBooks();
-            return buildResponse(traceId, "success", "Book details retrieved successfully", bookDetails, 200);
+            List<BookDetail> bookDetails = service.getAllBooksDetails();
+            return buildResponse("success", "Books retrieved successfully", bookDetails, traceId, 200);
         } catch (Exception e) {
             return handleException(traceId, "retrieve book details", e);
         }
@@ -54,7 +54,7 @@ public class BookDetailController {
         try {
             Optional<BookDetail> bookDetail = service.getBookById(id);
             if (bookDetail.isPresent()) {
-                return buildResponse(traceId, "success", "Book detail retrieved successfully", bookDetail.get(), 200);
+                return buildResponse( "success", "Book detail retrieved successfully", bookDetail.get(),traceId, 200);
             } else {
                 return buildResponse(traceId, "fail", "Book detail not found", null, 404);
             }
@@ -72,7 +72,7 @@ public class BookDetailController {
                 return buildResponse(traceId, "fail", validationError, null, 400);
             }
             BookDetail createdBookDetail = service.saveBook(bookDetail);
-            return buildResponse(traceId, "success", "Book detail created successfully", createdBookDetail, 201);
+            return buildResponse(  "success", "Book detail created successfully", createdBookDetail, traceId,201);
         } catch (Exception e) {
             return handleException(traceId, "create the book detail", e);
         }
@@ -86,7 +86,7 @@ public class BookDetailController {
             if (existingBookDetail.isPresent()) {
                 bookDetail.setId(existingBookDetail.get().getId());
                 BookDetail updatedBookDetail = service.saveBook(bookDetail);
-                return buildResponse(traceId, "success", "Book detail updated successfully", updatedBookDetail, 200);
+                return buildResponse(  "success", "Book detail updated successfully", updatedBookDetail, traceId,200);
             } else {
                 return buildResponse(traceId, "fail", "Book detail not found", null, 404);
             }
